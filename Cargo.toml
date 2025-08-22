@@ -5,4 +5,9 @@ edition = "2024"
 
 [dependencies]
 actix-web = "4.11.0"
+anyhow = "1.0.99"
+async-process = "2.4.0"
+derive_more = { version = "2.0.1", features = ["display"] }
 md5 = "0.8.0"
+polodb_core = "5.1.4"
+thiserror = "2.0.16"

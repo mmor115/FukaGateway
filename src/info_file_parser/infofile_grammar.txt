@@ -1,0 +1,28 @@
+group
+  : Ident '{' (kv_pair | group)* '}' 
+  ;
+
+kv_pair
+  : Ident rhs_val
+  ;
+
+rhs_val
+  : Ident
+  | Num
+  ;
+
+Ident
+  : [a-zA-Z_] [a-zA-Z0-9_.]*
+  ;
+  
+fragment Digit
+  : [0-9]
+  ;
+  
+Num
+  : [-]? Digit+ ([.] Digit+)? ([e] [-+]? Digit+)?
+  ;
+  
+Ws -> skip
+  : [ \n\r\t]+ 
+  ;
