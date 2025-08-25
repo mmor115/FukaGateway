@@ -3,6 +3,7 @@ use derive_more::Display;
 pub(crate) mod lexer;
 pub(crate) mod error;
 pub(crate) mod parser;
+pub(crate) mod flat_property_map;
 
 type Result<T> = core::result::Result<T, error::InfoFileParserError>;
 
@@ -32,7 +33,7 @@ impl LineCol {
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Display)]
 #[display("[{begin}..{end}]")]
-struct Interval<T> {
+pub struct Interval<T> {
     begin: T,
     end: T
 }

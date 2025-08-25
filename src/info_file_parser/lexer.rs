@@ -1,7 +1,7 @@
+use crate::info_file_parser::error::*;
+use crate::info_file_parser::{Interval, LineCol, Result};
 use derive_more::Display;
 use InfoFileParserError::UnexpectedChar;
-use crate::info_file_parser::{Interval, LineCol, Result};
-use crate::info_file_parser::error::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display)]
 pub enum InfoFileTokenKind {
@@ -197,10 +197,6 @@ impl InfoFileLexer {
 
     fn begin_to_owned_string(&self, begin: usize) -> String {
         self.text[begin..self.pos].iter().collect::<String>()
-    }
-
-    fn range_to_owned_string(&self, begin: usize, end: usize) -> String {
-        self.text[begin..end].iter().collect::<String>()
     }
 
     fn begin_to_interval(&self, begin: LineCol) -> Interval<LineCol> {

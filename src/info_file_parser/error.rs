@@ -1,4 +1,4 @@
-use crate::info_file_parser::error::InfoFileParserError::{UnexpectedChar, UnexpectedEof, UnexpectedToken};
+use crate::info_file_parser::error::InfoFileParserError::*;
 use crate::info_file_parser::LineCol;
 use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
@@ -15,7 +15,9 @@ pub enum InfoFileParserError {
     #[error("Unexpected character {0} at {1}")]  
     UnexpectedChar(char, LineCol),
     #[error("Unexpected token {0} at {pos}", pos = .0.interval.begin)]
-    UnexpectedToken(InfoFileToken)
+    UnexpectedToken(InfoFileToken),
+    #[error("Illegal numerical value {0} at {pos}: {1:?}", pos = .0.interval.begin)]
+    IllegalNumericalValue(InfoFileToken, std::num::ParseFloatError)
 }
 
 impl InfoFileParserError {
@@ -30,16 +32,17 @@ impl InfoFileParserError {
 impl actix_web::error::ResponseError for InfoFileParserError {
     fn status_code(&self) -> StatusCode {
         match self {
-            InfoFileParserError::IoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            UnexpectedEof(_) => StatusCode::BAD_REQUEST,
-            UnexpectedChar(_, _) => StatusCode::BAD_REQUEST,
-            UnexpectedToken(_) => StatusCode::BAD_REQUEST,
+            IoError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            UnexpectedEof(..) => StatusCode::BAD_REQUEST,
+            UnexpectedChar(..) => StatusCode::BAD_REQUEST,
+            UnexpectedToken(..) => StatusCode::BAD_REQUEST,
+            IllegalNumericalValue(..) => StatusCode::BAD_REQUEST
         }
     }
 
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code())
-                     .insert_header(ContentType::html())
+                     .insert_header(ContentType::plaintext())
                      .body(format!("Error while parsing info file: {}", self))
     }
 }
