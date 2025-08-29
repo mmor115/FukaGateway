@@ -1,15 +1,15 @@
 use derive_more::Display;
 
-pub(crate) mod lexer;
-pub(crate) mod error;
-pub(crate) mod parser;
-pub(crate) mod flat_property_map;
+pub mod lexer;
+pub mod error;
+pub mod parser;
+pub mod flat_property_map;
 
 type Result<T> = core::result::Result<T, error::InfoFileParserError>;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Display)]
 #[display("{line}:{col}")]
-pub (crate) struct LineCol {
+pub struct LineCol {
     line: u64,
     col: u64
 }

@@ -1,23 +1,24 @@
 use actix_web::http::header::ContentType;
-use crate::info_file_parser::error::InfoFileParserError;
+use FukaGateway_lib::info_file_parser::error::InfoFileParserError;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use serde_json::json;
 use thiserror::Error;
-use crate::job::JobError;
+use FukaGateway_lib::database;
+use FukaGateway_lib::job;
 
 #[derive(Error, Debug)]
 pub enum EndpointError {
     #[error("Error parsing info file: {0}")]
     InfoFileParserError(#[from] InfoFileParserError),
     #[error("Database error: {0}")]
-    DatabaseError(#[from] crate::database::error::DatabaseError),
+    DatabaseError(#[from] database::error::DatabaseError),
     #[error("Thread pool is shut down")]
     BlockingError(#[from] actix_web::error::BlockingError),
     #[error("I/O error: {0}")]
     IoError(#[from] std::io::Error),
     #[error("Job management error: {0}")]   
-    JobError(#[from] JobError),
+    JobError(#[from] job::JobError),
     #[error("No such resource")]
     NoSuchResource
 }

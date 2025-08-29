@@ -1,6 +1,6 @@
 [workspace]
-members = [
-    "FukaGateway"
+members = [ "FukaGateway-lib",
+    "FukaGateway-worker"
 ]
 
 resolver = "3"

@@ -3,16 +3,26 @@
 version = 4
 
 [[package]]
-name = "FukaGateway"
+name = "FukaGateway-lib"
 version = "0.1.0"
 dependencies = [
+ "async-process",
+ "derive_more 2.0.1",
+ "polodb_core",
+ "serde",
+ "thiserror 2.0.16",
+ "uuid",
+]
+
+[[package]]
+name = "FukaGateway-worker"
+version = "0.1.0"
+dependencies = [
+ "FukaGateway-lib",
  "actix-files",
  "actix-web",
  "async-fs",
- "async-process",
- "derive_more 2.0.1",
  "futures-lite",
- "polodb_core",
  "serde",
  "serde_json",
  "thiserror 2.0.16",

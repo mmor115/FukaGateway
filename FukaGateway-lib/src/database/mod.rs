@@ -1,4 +1,4 @@
-pub(crate) mod error;
+pub mod error;
 
 use crate::database::error::DatabaseError;
 use crate::info_file_parser::flat_property_map::PropMap;

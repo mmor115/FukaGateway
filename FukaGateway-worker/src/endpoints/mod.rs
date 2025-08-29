@@ -1,11 +1,11 @@
 mod error;
-use crate::database::{open_job_db, JobDbOperations, JobEntry};
+use FukaGateway_lib::database::{open_job_db, JobDbOperations, JobEntry};
 
 use crate::endpoints::error::EndpointError;
-use crate::info_file_parser::flat_property_map::{InfoFileToFlatPropertyMapVisitor, PropMap};
-use crate::info_file_parser::lexer::InfoFileLexer;
-use crate::info_file_parser::parser::InfoFileParser;
-use crate::job::{get_info_file_path, get_job_dir, get_job_status, get_result_file_path, submit_job, JobStatus};
+use FukaGateway_lib::info_file_parser::flat_property_map::{InfoFileToFlatPropertyMapVisitor, PropMap};
+use FukaGateway_lib::info_file_parser::lexer::InfoFileLexer;
+use FukaGateway_lib::info_file_parser::parser::InfoFileParser;
+use FukaGateway_lib::job::{get_info_file_path, get_job_dir, get_job_status, get_result_file_path, submit_job, JobStatus};
 use actix_web::{get, post, web, HttpResponse, Responder};
 use serde::Serialize;
 use std::io::ErrorKind::AlreadyExists;
