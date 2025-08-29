@@ -1,11 +1,11 @@
 use actix_web::http::header::ContentType;
-use FukaGateway_lib::info_file_parser::error::InfoFileParserError;
+use crate::info_file_parser::error::InfoFileParserError;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use serde_json::json;
 use thiserror::Error;
-use FukaGateway_lib::database;
-use FukaGateway_lib::job;
+use crate::database;
+use crate::job;
 
 #[derive(Error, Debug)]
 pub enum EndpointError {
@@ -19,6 +19,8 @@ pub enum EndpointError {
     IoError(#[from] std::io::Error),
     #[error("Job management error: {0}")]   
     JobError(#[from] job::JobError),
+    #[error("Shim error: {0}")]
+    ShimError(#[from] reqwest::Error),
     #[error("No such resource")]
     NoSuchResource
 }

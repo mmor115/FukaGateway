@@ -1,65 +1,16 @@
-mod error;
 use FukaGateway_lib::database::{open_job_db, JobDbOperations, JobEntry};
 
-use crate::endpoints::error::EndpointError;
+use actix_web::{get, post, web, Responder};
+use futures_lite::io::AsyncWriteExt;
+use std::io::ErrorKind::AlreadyExists;
+use uuid::Uuid;
+use FukaGateway_lib::endpoints::error::EndpointError;
+use FukaGateway_lib::endpoints::error::EndpointError::NoSuchResource;
+use FukaGateway_lib::endpoints::{JobPollResponse, SubmitInfoFileResponse};
 use FukaGateway_lib::info_file_parser::flat_property_map::{InfoFileToFlatPropertyMapVisitor, PropMap};
 use FukaGateway_lib::info_file_parser::lexer::InfoFileLexer;
 use FukaGateway_lib::info_file_parser::parser::InfoFileParser;
 use FukaGateway_lib::job::{get_info_file_path, get_job_dir, get_job_status, get_result_file_path, submit_job, JobStatus};
-use actix_web::{get, post, web, HttpResponse, Responder};
-use serde::Serialize;
-use std::io::ErrorKind::AlreadyExists;
-use uuid::Uuid;
-use crate::endpoints::error::EndpointError::NoSuchResource;
-use futures_lite::io::AsyncWriteExt;
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    println!("{}", req_body);
-    HttpResponse::Ok().body(req_body)
-}
-
-#[post("/lex")]
-async fn lex_info_file(req_body: String) -> Result<impl Responder, EndpointError> {
-    let tokens = InfoFileLexer::new(&req_body).lex()?;
-    let mut output = String::new();
-
-    for token in tokens {
-        output.push_str(&token.to_string());
-        output.push(' ');
-    }
-
-    Ok(HttpResponse::Ok().body(output))
-}
-
-#[post("/parse")]
-async fn parse_info_file(req_body: String) -> Result<impl Responder, EndpointError> {
-    let ast = {
-        let tokens = InfoFileLexer::new(&req_body).lex()?;
-        let mut par = InfoFileParser::new(tokens);
-        par.parse()?
-    };
-
-    let properties = InfoFileToFlatPropertyMapVisitor::new(&ast).visit();
-
-    let mut output = String::new();
-
-    for (key, value) in properties {
-        output.push_str(format!("{} -> {}\n", key, value).as_str());
-    }
-
-    Ok(HttpResponse::Ok().body(output))
-}
-
-#[derive(Serialize, Debug)]
-#[serde(tag = "job_status")]
-enum SubmitInfoFileResponse {
-    Submitted { job_id: Uuid },
-    AlreadySubmitted { job_id: Uuid },
-    AlreadyRunning { job_id: Uuid },
-    AlreadyFinished { job_id: Uuid },
-    AlreadyFailed { job_id: Uuid }
-}
 
 #[post("submit")]
 async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointError> {
@@ -140,16 +91,6 @@ async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointEr
             }))
         }
     }
-}
-
-#[derive(Serialize, Debug)]
-#[serde(tag = "job_status")]
-enum JobPollResponse {
-    NotFound,
-    Pending,
-    Running,
-    Finished,
-    Failed
 }
 
 #[get("poll/{job_id}")]
