@@ -18,7 +18,7 @@ async fn main() -> io::Result<()> {
             .service(endpoints::poll_job)
             .service(endpoints::download_job)
     })
-    .bind(("127.0.0.1", SHIM_PORT))?
+    .bind(("0.0.0.0", SHIM_PORT))?
     .run()
     .await
 }
