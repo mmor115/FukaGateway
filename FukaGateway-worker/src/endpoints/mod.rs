@@ -93,6 +93,22 @@ async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointEr
     }
 }
 
+#[get("jobs")]
+async fn list_jobs() -> Result<impl Responder, EndpointError> {
+    let db = open_job_db()?;
+
+    let job_entries = web::block(move || {
+        db.list_jobs()
+          .map(|jobs|
+              jobs.into_iter()
+                  .map(|j| j.id)
+                  .collect::<Vec<Uuid>>()
+          )
+    }).await??;
+
+    Ok(web::Json(job_entries))
+}
+
 #[get("jobs/{job_id}/status")]
 async fn poll_job(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError> {
     let job_id = path.into_inner();

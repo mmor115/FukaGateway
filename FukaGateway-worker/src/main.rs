@@ -12,6 +12,7 @@ async fn main() -> io::Result<()> {
             .service(endpoints::poll_job)
             .service(endpoints::download_job)
             .service(endpoints::get_job_info)
+            .service(endpoints::list_jobs)
     })
     .bind(("127.0.0.1", WORKER_PORT))?
     .run()

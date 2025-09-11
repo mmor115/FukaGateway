@@ -23,6 +23,7 @@ pub trait JobDbOperations {
     fn id_search(&self, id: Uuid) -> Result<Option<JobEntry>, DatabaseError>;
     fn insert_job(&mut self, job: &JobEntry) -> Result<InsertOneResult, DatabaseError>;
     fn update_job_status(&mut self, id: Uuid, status: JobStatus) -> Result<UpdateResult, DatabaseError>;
+    fn list_jobs(&self) -> Result<Vec<JobEntry>, DatabaseError>;
 }
 
 impl<C: CollectionT<JobEntry>> JobDbOperations for C {
@@ -59,6 +60,19 @@ impl<C: CollectionT<JobEntry>> JobDbOperations for C {
         })
         .map_err(|e| e.into())
     }
+
+    fn list_jobs(&self) -> Result<Vec<JobEntry>, DatabaseError> {
+        let cursor = self.find(doc! {
+
+        }).run()?;
+
+        let mut jobs = Vec::new();
+        for job in cursor {
+            jobs.push(job?);
+        }
+
+        Ok(jobs)
+    }
 }
 
 pub struct JobDb {
@@ -81,6 +95,10 @@ impl JobDbOperations for JobDb {
 
     fn update_job_status(&mut self, id: Uuid, status: JobStatus) -> Result<UpdateResult, DatabaseError> {
         self.collection.update_job_status(id, status)
+    }
+
+    fn list_jobs(&self) -> Result<Vec<JobEntry>, DatabaseError> {
+        self.collection.list_jobs()
     }
 }
 
@@ -115,6 +133,10 @@ impl JobDbOperations for JobTransaction {
 
     fn update_job_status(&mut self, id: Uuid, status: JobStatus) -> Result<UpdateResult, DatabaseError> {
         self.collection.update_job_status(id, status)
+    }
+
+    fn list_jobs(&self) -> Result<Vec<JobEntry>, DatabaseError> {
+        self.collection.list_jobs()
     }
 }
 

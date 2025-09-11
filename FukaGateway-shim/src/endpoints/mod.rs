@@ -20,6 +20,21 @@ async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointEr
     )
 }
 
+#[get("jobs")]
+async fn list_jobs() -> Result<impl Responder, EndpointError> {
+    let client = reqwest::Client::new();
+    let resp = client.get(format!("http://localhost:{}/jobs", WORKER_PORT)).send().await?;
+
+    let status = StatusCode::from_u16(resp.status().as_u16()).unwrap();
+    let body = resp.text().await?;
+
+    Ok(
+        HttpResponse::build(status)
+                     .insert_header(ContentType::json())
+                     .body(body)
+    )
+}
+
 #[get("jobs/{job_id}/status")]
 async fn poll_job(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError> {
     let client = reqwest::Client::new();
