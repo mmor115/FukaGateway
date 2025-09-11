@@ -12,7 +12,7 @@ use FukaGateway_lib::info_file_parser::lexer::InfoFileLexer;
 use FukaGateway_lib::info_file_parser::parser::InfoFileParser;
 use FukaGateway_lib::job::{get_info_file_path, get_job_dir, get_job_status, get_result_file_path, submit_job, JobStatus};
 
-#[post("submit")]
+#[post("jobs")]
 async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointError> {
     let (properties, req_body) = web::block(move || {
         do_parse_info_file(&req_body).map(|p| (p, req_body))
@@ -93,7 +93,7 @@ async fn submit_info_file(req_body: String) -> Result<impl Responder, EndpointEr
     }
 }
 
-#[get("poll/{job_id}")]
+#[get("jobs/{job_id}/status")]
 async fn poll_job(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError> {
     let job_id = path.into_inner();
     let db = open_job_db()?;
@@ -134,7 +134,28 @@ async fn poll_job(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError
     ))
 }
 
-#[get("download/{job_id}")]
+#[get("jobs/{job_id}/info")]
+async fn get_job_info(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError> {
+    let job_id = path.into_inner();
+    let db = open_job_db()?;
+
+    let job_entry = web::block(move || {
+        db.id_search(job_id)
+    }).await??;
+
+    let job_entry = match job_entry {
+        Some(j) => j,
+        None => {
+            return Err(NoSuchResource);
+        }
+    };
+
+    Ok(actix_files::NamedFile::open(
+        get_info_file_path(job_entry.id)
+    )?)
+}
+
+#[get("jobs/{job_id}/result")]
 async fn download_job(path: web::Path<Uuid>) -> Result<impl Responder, EndpointError> {
     let job_id = path.into_inner();
     let db = open_job_db()?;
