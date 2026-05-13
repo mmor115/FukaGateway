@@ -1,5 +1,5 @@
 # FukaGateway
-FukaGateway is a fully-functional proof of concept demonstrating the use of Landlock to secure a science gateway without modifying the underlying science application.
+FukaGateway is a fully-functional proof of concept demonstrating the use of Landlock/Seccomp to secure a science gateway without modifying the underlying science application.
 
 More info will be added here later. Please see the paper (to be added later) for more information.
 
